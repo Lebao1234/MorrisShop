@@ -1,0 +1,39 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: morris-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    container_name: morris-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  server:
+    build: ./server
+    container_name: morris-server
+    restart: unless-stopped
+    depends_on: [mongo]
+    ports:
+      - "5000:5000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017/morris_shop
+    env_file: ./server/.env
+    profiles: ["full"]
+
+  client:
+    build: ./client
+    container_name: morris-client
+    depends_on: [server]
+    ports:
+      - "5173:5173"
+    profiles: ["full"]
+
+volumes:
+  mongo_data:

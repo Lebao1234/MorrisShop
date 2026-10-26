@@ -1,0 +1,4495 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Morris Hair Wax Shop API",
+    "version": "1.0.0",
+    "description": "API cho website thương mại điện tử bán sáp vuốt tóc nam.\n\n**Cách test API có phân quyền:**\n1. Gọi `POST /auth/login` với tài khoản seed (admin@morrisshop.vn / admin123).\n2. Copy `data.accessToken` trong response.\n3. Bấm nút **Authorize** ở góc trên bên phải, dán token vào (không cần thêm chữ Bearer).\n4. Các endpoint có biểu tượng ổ khoá giờ đã gọi được.\n\nRefresh token được lưu trong httpOnly cookie nên `POST /auth/refresh-token` chỉ hoạt động khi trình duyệt giữ cookie.",
+    "contact": {
+      "name": "Morris Grooming Co."
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api",
+      "description": "Local dev"
+    },
+    {
+      "url": "https://api.yourdomain.com/api",
+      "description": "Production"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Address": {
+        "type": "object",
+        "required": [
+          "fullName",
+          "phone",
+          "province",
+          "district",
+          "ward",
+          "street"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "Nguyễn Văn A"
+          },
+          "phone": {
+            "type": "string",
+            "example": "0912345678"
+          },
+          "province": {
+            "type": "string",
+            "example": "Hà Nội"
+          },
+          "district": {
+            "type": "string",
+            "example": "Cầu Giấy"
+          },
+          "ward": {
+            "type": "string",
+            "example": "Dịch Vọng"
+          },
+          "street": {
+            "type": "string",
+            "example": "Số 12 ngõ 5 Trần Thái Tông"
+          },
+          "isDefault": {
+            "type": "boolean"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "name": {
+            "type": "string",
+            "example": "Nguyễn Văn A"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "customer",
+              "staff",
+              "admin"
+            ]
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "fullName",
+                "phone",
+                "province",
+                "district",
+                "ward",
+                "street"
+              ],
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "665f1c2a9b1e4a0012ab34cd"
+                },
+                "fullName": {
+                  "type": "string",
+                  "example": "Nguyễn Văn A"
+                },
+                "phone": {
+                  "type": "string",
+                  "example": "0912345678"
+                },
+                "province": {
+                  "type": "string",
+                  "example": "Hà Nội"
+                },
+                "district": {
+                  "type": "string",
+                  "example": "Cầu Giấy"
+                },
+                "ward": {
+                  "type": "string",
+                  "example": "Dịch Vọng"
+                },
+                "street": {
+                  "type": "string",
+                  "example": "Số 12 ngõ 5 Trần Thái Tông"
+                },
+                "isDefault": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "wishlist": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "665f1c2a9b1e4a0012ab34cd"
+            }
+          },
+          "isVerified": {
+            "type": "boolean"
+          },
+          "isBlocked": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Variant": {
+        "type": "object",
+        "required": [
+          "name",
+          "price"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "name": {
+            "type": "string",
+            "example": "80g"
+          },
+          "price": {
+            "type": "number",
+            "example": 390000
+          },
+          "salePrice": {
+            "type": "number",
+            "example": 350000
+          },
+          "stock": {
+            "type": "integer",
+            "example": 40
+          },
+          "sku": {
+            "type": "string",
+            "example": "IRON-CLAY-80G"
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "name": {
+            "type": "string",
+            "example": "Sáp vuốt tóc"
+          },
+          "slug": {
+            "type": "string",
+            "example": "sap-vuot-toc"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "parentCategory": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd",
+            "nullable": true
+          },
+          "position": {
+            "type": "integer"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CategoryInput": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Sáp vuốt tóc"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "parentCategory": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "integer"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "name": {
+            "type": "string",
+            "example": "Iron Clay Matte Wax"
+          },
+          "slug": {
+            "type": "string",
+            "example": "iron-clay-matte-wax"
+          },
+          "category": {
+            "oneOf": [
+              {
+                "type": "string",
+                "example": "665f1c2a9b1e4a0012ab34cd"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "example": "665f1c2a9b1e4a0012ab34cd"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Sáp vuốt tóc"
+                  },
+                  "slug": {
+                    "type": "string",
+                    "example": "sap-vuot-toc"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string"
+                  },
+                  "parentCategory": {
+                    "type": "string",
+                    "example": "665f1c2a9b1e4a0012ab34cd",
+                    "nullable": true
+                  },
+                  "position": {
+                    "type": "integer"
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            ]
+          },
+          "brand": {
+            "type": "string",
+            "example": "Morris"
+          },
+          "description": {
+            "type": "string"
+          },
+          "shortDescription": {
+            "type": "string"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hairType": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "tóc thẳng",
+              "tóc dày"
+            ]
+          },
+          "holdLevel": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "extreme"
+            ]
+          },
+          "finish": {
+            "type": "string",
+            "enum": [
+              "matte",
+              "shiny",
+              "natural"
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "price"
+              ],
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "665f1c2a9b1e4a0012ab34cd"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "80g"
+                },
+                "price": {
+                  "type": "number",
+                  "example": 390000
+                },
+                "salePrice": {
+                  "type": "number",
+                  "example": 350000
+                },
+                "stock": {
+                  "type": "integer",
+                  "example": 40
+                },
+                "sku": {
+                  "type": "string",
+                  "example": "IRON-CLAY-80G"
+                }
+              }
+            }
+          },
+          "ingredients": {
+            "type": "string"
+          },
+          "howToUse": {
+            "type": "string"
+          },
+          "ratingsAverage": {
+            "type": "number",
+            "example": 4.7
+          },
+          "numReviews": {
+            "type": "integer",
+            "example": 23
+          },
+          "soldCount": {
+            "type": "integer",
+            "example": 154
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "bestseller",
+              "new"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "minPrice": {
+            "type": "number",
+            "readOnly": true
+          },
+          "totalStock": {
+            "type": "integer",
+            "readOnly": true
+          }
+        }
+      },
+      "ProductInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "category",
+          "images",
+          "variants"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Iron Clay Matte Wax"
+          },
+          "category": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "shortDescription": {
+            "type": "string"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "hairType": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "holdLevel": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "extreme"
+            ]
+          },
+          "finish": {
+            "type": "string",
+            "enum": [
+              "matte",
+              "shiny",
+              "natural"
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "price"
+              ],
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "665f1c2a9b1e4a0012ab34cd"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "80g"
+                },
+                "price": {
+                  "type": "number",
+                  "example": 390000
+                },
+                "salePrice": {
+                  "type": "number",
+                  "example": 350000
+                },
+                "stock": {
+                  "type": "integer",
+                  "example": 40
+                },
+                "sku": {
+                  "type": "string",
+                  "example": "IRON-CLAY-80G"
+                }
+              }
+            },
+            "minItems": 1
+          },
+          "ingredients": {
+            "type": "string"
+          },
+          "howToUse": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CartItem": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "product": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "example": "665f1c2a9b1e4a0012ab34cd"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string"
+              }
+            }
+          },
+          "variantSku": {
+            "type": "string"
+          },
+          "variantName": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "stock": {
+            "type": "integer"
+          },
+          "lineTotal": {
+            "type": "number"
+          },
+          "outOfStock": {
+            "type": "boolean"
+          },
+          "priceChanged": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Cart": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "665f1c2a9b1e4a0012ab34cd"
+                },
+                "product": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "string",
+                      "example": "665f1c2a9b1e4a0012ab34cd"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "image": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "variantSku": {
+                  "type": "string"
+                },
+                "variantName": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": "number"
+                },
+                "quantity": {
+                  "type": "integer"
+                },
+                "stock": {
+                  "type": "integer"
+                },
+                "lineTotal": {
+                  "type": "number"
+                },
+                "outOfStock": {
+                  "type": "boolean"
+                },
+                "priceChanged": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "totalQuantity": {
+            "type": "integer"
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "orderCode": {
+            "type": "string",
+            "example": "MRS20250908ABCDE"
+          },
+          "user": {
+            "oneOf": [
+              {
+                "type": "string",
+                "example": "665f1c2a9b1e4a0012ab34cd"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "example": "665f1c2a9b1e4a0012ab34cd"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Nguyễn Văn A"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "avatar": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "customer",
+                      "staff",
+                      "admin"
+                    ]
+                  },
+                  "addresses": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "fullName",
+                        "phone",
+                        "province",
+                        "district",
+                        "ward",
+                        "street"
+                      ],
+                      "properties": {
+                        "_id": {
+                          "type": "string",
+                          "example": "665f1c2a9b1e4a0012ab34cd"
+                        },
+                        "fullName": {
+                          "type": "string",
+                          "example": "Nguyễn Văn A"
+                        },
+                        "phone": {
+                          "type": "string",
+                          "example": "0912345678"
+                        },
+                        "province": {
+                          "type": "string",
+                          "example": "Hà Nội"
+                        },
+                        "district": {
+                          "type": "string",
+                          "example": "Cầu Giấy"
+                        },
+                        "ward": {
+                          "type": "string",
+                          "example": "Dịch Vọng"
+                        },
+                        "street": {
+                          "type": "string",
+                          "example": "Số 12 ngõ 5 Trần Thái Tông"
+                        },
+                        "isDefault": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "wishlist": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "665f1c2a9b1e4a0012ab34cd"
+                    }
+                  },
+                  "isVerified": {
+                    "type": "boolean"
+                  },
+                  "isBlocked": {
+                    "type": "boolean"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "product": {
+                  "type": "string",
+                  "example": "665f1c2a9b1e4a0012ab34cd"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "string"
+                },
+                "variantSku": {
+                  "type": "string"
+                },
+                "variantName": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": "number"
+                },
+                "quantity": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "shippingAddress": {
+            "type": "object",
+            "required": [
+              "fullName",
+              "phone",
+              "province",
+              "district",
+              "ward",
+              "street"
+            ],
+            "properties": {
+              "_id": {
+                "type": "string",
+                "example": "665f1c2a9b1e4a0012ab34cd"
+              },
+              "fullName": {
+                "type": "string",
+                "example": "Nguyễn Văn A"
+              },
+              "phone": {
+                "type": "string",
+                "example": "0912345678"
+              },
+              "province": {
+                "type": "string",
+                "example": "Hà Nội"
+              },
+              "district": {
+                "type": "string",
+                "example": "Cầu Giấy"
+              },
+              "ward": {
+                "type": "string",
+                "example": "Dịch Vọng"
+              },
+              "street": {
+                "type": "string",
+                "example": "Số 12 ngõ 5 Trần Thái Tông"
+              },
+              "isDefault": {
+                "type": "boolean"
+              }
+            }
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "cod",
+              "vnpay",
+              "momo",
+              "stripe"
+            ]
+          },
+          "paymentStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "paid",
+              "failed",
+              "refunded"
+            ]
+          },
+          "orderStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "confirmed",
+              "processing",
+              "shipping",
+              "delivered",
+              "cancelled",
+              "returned"
+            ]
+          },
+          "statusHistory": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "shippingFee": {
+            "type": "number"
+          },
+          "discount": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "couponCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OrderInput": {
+        "type": "object",
+        "required": [
+          "shippingAddress"
+        ],
+        "properties": {
+          "shippingAddress": {
+            "type": "object",
+            "required": [
+              "fullName",
+              "phone",
+              "province",
+              "district",
+              "ward",
+              "street"
+            ],
+            "properties": {
+              "fullName": {
+                "type": "string",
+                "example": "Nguyễn Văn A"
+              },
+              "phone": {
+                "type": "string",
+                "example": "0912345678"
+              },
+              "province": {
+                "type": "string",
+                "example": "Hà Nội"
+              },
+              "district": {
+                "type": "string",
+                "example": "Cầu Giấy"
+              },
+              "ward": {
+                "type": "string",
+                "example": "Dịch Vọng"
+              },
+              "street": {
+                "type": "string",
+                "example": "Số 12 ngõ 5 Trần Thái Tông"
+              }
+            }
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "cod",
+              "vnpay",
+              "momo",
+              "stripe"
+            ],
+            "default": "cod"
+          },
+          "couponCode": {
+            "type": "string",
+            "example": "MORRIS10"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "Coupon": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "code": {
+            "type": "string",
+            "example": "MORRIS10"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "percent",
+              "fixed"
+            ]
+          },
+          "value": {
+            "type": "number",
+            "example": 10
+          },
+          "minOrderValue": {
+            "type": "number"
+          },
+          "maxDiscount": {
+            "type": "number"
+          },
+          "usageLimit": {
+            "type": "integer"
+          },
+          "usedCount": {
+            "type": "integer"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CouponInput": {
+        "type": "object",
+        "required": [
+          "code",
+          "type",
+          "value",
+          "expiresAt"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "MORRIS10"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "percent",
+              "fixed"
+            ]
+          },
+          "value": {
+            "type": "number",
+            "example": 10
+          },
+          "minOrderValue": {
+            "type": "number",
+            "example": 300000
+          },
+          "maxDiscount": {
+            "type": "number",
+            "example": 100000
+          },
+          "usageLimit": {
+            "type": "integer",
+            "example": 100
+          },
+          "perUserLimit": {
+            "type": "integer",
+            "example": 1
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Review": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "product": {
+            "oneOf": [
+              {
+                "type": "string",
+                "example": "665f1c2a9b1e4a0012ab34cd"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "example": "665f1c2a9b1e4a0012ab34cd"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Iron Clay Matte Wax"
+                  },
+                  "slug": {
+                    "type": "string",
+                    "example": "iron-clay-matte-wax"
+                  },
+                  "category": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "example": "665f1c2a9b1e4a0012ab34cd"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "_id": {
+                            "type": "string",
+                            "example": "665f1c2a9b1e4a0012ab34cd"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Sáp vuốt tóc"
+                          },
+                          "slug": {
+                            "type": "string",
+                            "example": "sap-vuot-toc"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "image": {
+                            "type": "string"
+                          },
+                          "parentCategory": {
+                            "type": "string",
+                            "example": "665f1c2a9b1e4a0012ab34cd",
+                            "nullable": true
+                          },
+                          "position": {
+                            "type": "integer"
+                          },
+                          "isActive": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "brand": {
+                    "type": "string",
+                    "example": "Morris"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "shortDescription": {
+                    "type": "string"
+                  },
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "hairType": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "tóc thẳng",
+                      "tóc dày"
+                    ]
+                  },
+                  "holdLevel": {
+                    "type": "string",
+                    "enum": [
+                      "low",
+                      "medium",
+                      "high",
+                      "extreme"
+                    ]
+                  },
+                  "finish": {
+                    "type": "string",
+                    "enum": [
+                      "matte",
+                      "shiny",
+                      "natural"
+                    ]
+                  },
+                  "variants": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "name",
+                        "price"
+                      ],
+                      "properties": {
+                        "_id": {
+                          "type": "string",
+                          "example": "665f1c2a9b1e4a0012ab34cd"
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "80g"
+                        },
+                        "price": {
+                          "type": "number",
+                          "example": 390000
+                        },
+                        "salePrice": {
+                          "type": "number",
+                          "example": 350000
+                        },
+                        "stock": {
+                          "type": "integer",
+                          "example": 40
+                        },
+                        "sku": {
+                          "type": "string",
+                          "example": "IRON-CLAY-80G"
+                        }
+                      }
+                    }
+                  },
+                  "ingredients": {
+                    "type": "string"
+                  },
+                  "howToUse": {
+                    "type": "string"
+                  },
+                  "ratingsAverage": {
+                    "type": "number",
+                    "example": 4.7
+                  },
+                  "numReviews": {
+                    "type": "integer",
+                    "example": 23
+                  },
+                  "soldCount": {
+                    "type": "integer",
+                    "example": 154
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "bestseller",
+                      "new"
+                    ]
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  },
+                  "minPrice": {
+                    "type": "number",
+                    "readOnly": true
+                  },
+                  "totalStock": {
+                    "type": "integer",
+                    "readOnly": true
+                  }
+                }
+              }
+            ]
+          },
+          "user": {
+            "oneOf": [
+              {
+                "type": "string",
+                "example": "665f1c2a9b1e4a0012ab34cd"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "example": "665f1c2a9b1e4a0012ab34cd"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Nguyễn Văn A"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "avatar": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "customer",
+                      "staff",
+                      "admin"
+                    ]
+                  },
+                  "addresses": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "fullName",
+                        "phone",
+                        "province",
+                        "district",
+                        "ward",
+                        "street"
+                      ],
+                      "properties": {
+                        "_id": {
+                          "type": "string",
+                          "example": "665f1c2a9b1e4a0012ab34cd"
+                        },
+                        "fullName": {
+                          "type": "string",
+                          "example": "Nguyễn Văn A"
+                        },
+                        "phone": {
+                          "type": "string",
+                          "example": "0912345678"
+                        },
+                        "province": {
+                          "type": "string",
+                          "example": "Hà Nội"
+                        },
+                        "district": {
+                          "type": "string",
+                          "example": "Cầu Giấy"
+                        },
+                        "ward": {
+                          "type": "string",
+                          "example": "Dịch Vọng"
+                        },
+                        "street": {
+                          "type": "string",
+                          "example": "Số 12 ngõ 5 Trần Thái Tông"
+                        },
+                        "isDefault": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "wishlist": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "665f1c2a9b1e4a0012ab34cd"
+                    }
+                  },
+                  "isVerified": {
+                    "type": "boolean"
+                  },
+                  "isBlocked": {
+                    "type": "boolean"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            ]
+          },
+          "rating": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "comment": {
+            "type": "string"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isApproved": {
+            "type": "boolean"
+          },
+          "adminReply": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Banner": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "665f1c2a9b1e4a0012ab34cd"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "hero_video",
+              "hero_image",
+              "collection_banner",
+              "promo",
+              "story"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "eyebrow": {
+            "type": "string"
+          },
+          "ctaLabel": {
+            "type": "string"
+          },
+          "mediaUrl": {
+            "type": "string"
+          },
+          "posterUrl": {
+            "type": "string"
+          },
+          "linkUrl": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RegisterInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Nguyễn Văn A"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "customer@morrisshop.vn"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6,
+            "example": "customer123"
+          },
+          "phone": {
+            "type": "string",
+            "example": "0912345678"
+          }
+        }
+      },
+      "LoginInput": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "admin@morrisshop.vn"
+          },
+          "password": {
+            "type": "string",
+            "example": "admin123"
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "user": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "example": "665f1c2a9b1e4a0012ab34cd"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Nguyễn Văn A"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "avatar": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "customer",
+                      "staff",
+                      "admin"
+                    ]
+                  },
+                  "addresses": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "fullName",
+                        "phone",
+                        "province",
+                        "district",
+                        "ward",
+                        "street"
+                      ],
+                      "properties": {
+                        "_id": {
+                          "type": "string",
+                          "example": "665f1c2a9b1e4a0012ab34cd"
+                        },
+                        "fullName": {
+                          "type": "string",
+                          "example": "Nguyễn Văn A"
+                        },
+                        "phone": {
+                          "type": "string",
+                          "example": "0912345678"
+                        },
+                        "province": {
+                          "type": "string",
+                          "example": "Hà Nội"
+                        },
+                        "district": {
+                          "type": "string",
+                          "example": "Cầu Giấy"
+                        },
+                        "ward": {
+                          "type": "string",
+                          "example": "Dịch Vọng"
+                        },
+                        "street": {
+                          "type": "string",
+                          "example": "Số 12 ngõ 5 Trần Thái Tông"
+                        },
+                        "isDefault": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "wishlist": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": "665f1c2a9b1e4a0012ab34cd"
+                    }
+                  },
+                  "isVerified": {
+                    "type": "boolean"
+                  },
+                  "isBlocked": {
+                    "type": "boolean"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              "accessToken": {
+                "type": "string",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              }
+            }
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Thành công"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "PaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer",
+                "example": 1
+              },
+              "limit": {
+                "type": "integer",
+                "example": 12
+              },
+              "total": {
+                "type": "integer",
+                "example": 48
+              },
+              "totalPages": {
+                "type": "integer",
+                "example": 4
+              },
+              "hasNext": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Dữ liệu không hợp lệ"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Chưa đăng nhập hoặc token hết hạn",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Không đủ quyền",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Không tìm thấy tài nguyên",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Dữ liệu đầu vào không hợp lệ",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "System",
+      "description": "Health check"
+    },
+    {
+      "name": "Auth",
+      "description": "Đăng ký, đăng nhập, JWT, quên mật khẩu"
+    },
+    {
+      "name": "Users",
+      "description": "Hồ sơ, địa chỉ, wishlist, quản lý người dùng"
+    },
+    {
+      "name": "Categories",
+      "description": "Danh mục sản phẩm"
+    },
+    {
+      "name": "Products",
+      "description": "Sản phẩm, tìm kiếm, lọc, tồn kho"
+    },
+    {
+      "name": "Reviews",
+      "description": "Đánh giá sản phẩm"
+    },
+    {
+      "name": "Cart",
+      "description": "Giỏ hàng"
+    },
+    {
+      "name": "Orders",
+      "description": "Đặt hàng, trạng thái, thanh toán"
+    },
+    {
+      "name": "Coupons",
+      "description": "Mã giảm giá"
+    },
+    {
+      "name": "Banners",
+      "description": "Nội dung trang chủ"
+    },
+    {
+      "name": "Dashboard",
+      "description": "Thống kê admin"
+    },
+    {
+      "name": "Upload",
+      "description": "Tải ảnh lên Cloudinary"
+    }
+  ],
+  "paths": {
+    "/users/profile": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Cap nhat ho so cua chinh minh",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "0912345678"
+                  },
+                  "avatar": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã cập nhật hồ sơ"
+          }
+        }
+      }
+    },
+    "/users/addresses": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Danh sach dia chi cua toi",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach dia chi"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Them dia chi giao hang",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Address"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đã thêm địa chỉ"
+          }
+        }
+      }
+    },
+    "/users/addresses/{addressId}": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Cap nhat dia chi",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "addressId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Address"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã cập nhật địa chỉ"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Xoa dia chi",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "addressId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đã xoá địa chỉ"
+          }
+        }
+      }
+    },
+    "/users/wishlist": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Danh sach san pham yeu thich",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach san pham"
+          }
+        }
+      }
+    },
+    "/users/wishlist/{productId}": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Them/bo san pham khoi danh sach yeu thich (toggle)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "productId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{ added: boolean }"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Bo san pham khoi danh sach yeu thich",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "productId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Da cap nhat wishlist"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Danh sach nguoi dung (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "role",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "customer",
+                "staff",
+                "admin"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "isBlocked",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach nguoi dung co phan trang"
+          },
+          "403": {
+            "description": "Khong du quyen"
+          }
+        }
+      }
+    },
+    "/users/{id}/block": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Khoa / mo khoa tai khoan (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "isBlocked"
+                ],
+                "properties": {
+                  "isBlocked": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Da cap nhat trang thai tai khoan"
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Chi tiet nguoi dung (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thong tin nguoi dung"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Cap nhat nguoi dung, phan quyen staff (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "customer",
+                      "staff",
+                      "admin"
+                    ]
+                  },
+                  "isBlocked": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Da cap nhat"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Xoa nguoi dung (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đã xoá"
+          }
+        }
+      }
+    },
+    "/reviews/product/{productId}": {
+      "get": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "Danh gia da duyet cua mot san pham",
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "productId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "rating",
+            "description": "Loc theo so sao",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach danh gia. meta.breakdown chua so luot theo tung muc sao"
+          }
+        }
+      }
+    },
+    "/reviews/reviewable": {
+      "get": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "San pham da nhan nhung chua danh gia",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach san pham co the danh gia"
+          }
+        }
+      }
+    },
+    "/reviews": {
+      "get": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "Tat ca danh gia, dung cho man hinh duyet (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "isApproved",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach danh gia co phan trang"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "Viet danh gia (chi khach da nhan hang)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "productId",
+                  "rating",
+                  "comment"
+                ],
+                "properties": {
+                  "productId": {
+                    "type": "string"
+                  },
+                  "rating": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5
+                  },
+                  "comment": {
+                    "type": "string",
+                    "minLength": 10
+                  },
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Danh gia dang cho duyet"
+          },
+          "403": {
+            "description": "Chua mua/nhan san pham nay"
+          },
+          "409": {
+            "description": "Da danh gia san pham nay roi"
+          }
+        }
+      }
+    },
+    "/reviews/{id}/approve": {
+      "put": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "Duyet / an danh gia (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "isApproved"
+                ],
+                "properties": {
+                  "isApproved": {
+                    "type": "boolean"
+                  },
+                  "adminReply": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Da cap nhat trang thai duyet"
+          }
+        }
+      }
+    },
+    "/reviews/{id}": {
+      "put": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "Sua danh gia cua chinh minh (se can duyet lai)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đã cập nhật đánh giá"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "Xoa danh gia (chu so huu hoac admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đã xoá đánh giá"
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Danh sach san pham (loc, tim kiem, sap xep, phan trang)",
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 12,
+              "maximum": 100
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "description": "Slug hoac ID danh muc (bao gom ca danh muc con)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "description": "Tu khoa tim kiem (MongoDB text index)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "holdLevel",
+            "description": "Do giu nep, ngan cach bang dau phay",
+            "schema": {
+              "type": "string",
+              "example": "medium,high"
+            }
+          },
+          {
+            "in": "query",
+            "name": "finish",
+            "schema": {
+              "type": "string",
+              "example": "matte,natural"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hairType",
+            "schema": {
+              "type": "string",
+              "example": "toc thang,toc xoan"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tags",
+            "schema": {
+              "type": "string",
+              "example": "bestseller,new"
+            }
+          },
+          {
+            "in": "query",
+            "name": "minPrice",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "maxPrice",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "inStock",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "newest",
+                "oldest",
+                "bestseller",
+                "rating",
+                "price-asc",
+                "price-desc",
+                "name"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach san pham co phan trang",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Product"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Tao san pham moi (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tao thanh cong"
+          },
+          "401": {
+            "description": "Chua dang nhap"
+          },
+          "403": {
+            "description": "Khong du quyen"
+          }
+        }
+      }
+    },
+    "/products/showcase": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "San pham ban chay va moi nhat cho trang chu",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "{ bestSellers, newArrivals }"
+          }
+        }
+      }
+    },
+    "/products/suggestions": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Goi y tim kiem nhanh cho o search",
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Toi da 6 san pham goi y"
+          }
+        }
+      }
+    },
+    "/products/low-stock": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "San pham sap het hang (admin/staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "threshold",
+            "schema": {
+              "type": "integer",
+              "default": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach san pham ton kho thap"
+          }
+        }
+      }
+    },
+    "/products/{id}/related": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "San pham lien quan",
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 4
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach san pham lien quan"
+          },
+          "404": {
+            "description": "Không tìm thấy sản phẩm"
+          }
+        }
+      }
+    },
+    "/products/{id}/stock": {
+      "patch": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Cap nhat ton kho theo variant (admin/staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "updates"
+                ],
+                "properties": {
+                  "updates": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "sku": {
+                          "type": "string"
+                        },
+                        "stock": {
+                          "type": "integer",
+                          "description": "Dat ton kho ve giá trị tuyet doi"
+                        },
+                        "delta": {
+                          "type": "integer",
+                          "description": "Cong/tru tuong doi"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã cập nhật tồn kho"
+          }
+        }
+      }
+    },
+    "/products/{slug}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Chi tiet san pham theo slug",
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chi tiet san pham",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Product"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy sản phẩm"
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "put": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Cap nhat san pham (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Da cap nhat"
+          },
+          "404": {
+            "description": "Không tìm thấy sản phẩm"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Xoa san pham (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đã xoá"
+          }
+        }
+      }
+    },
+    "/orders/payment/vnpay-return": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Xac thuc ket qua thanh toan VNPay (client goi sau khi duoc redirect ve)",
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "vnp_TxnRef",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_ResponseCode",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vnp_SecureHash",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{ success, order }"
+          },
+          "400": {
+            "description": "Chu ky khong hop le"
+          }
+        }
+      }
+    },
+    "/orders/payment/vnpay-ipn": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "IPN endpoint cho VNPay goi server-to-server",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "{ RspCode, Message }"
+          }
+        }
+      }
+    },
+    "/orders/payment/stripe-webhook": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Webhook Stripe (checkout.session.completed)",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Da xu ly"
+          }
+        }
+      }
+    },
+    "/orders/preview": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Xem truoc tong tien don hang (phi ship, ma giam gia) truoc khi dat",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "couponCode": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "{ subtotal, shippingFee, discount, total, amountToFreeShipping }"
+          }
+        }
+      }
+    },
+    "/orders/my-orders": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Lich su don hang cua toi",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "confirmed",
+                "processing",
+                "shipping",
+                "delivered",
+                "cancelled",
+                "returned"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach don hang",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Order"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Tao don hang tu gio hang (tinh lai gia o server)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đặt hàng thành công. payment.redirectUrl khac null neu can chuyen sang cong thanh toan"
+          },
+          "400": {
+            "description": "Gio hang trong hoac khong du ton kho"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Danh sach tat ca don hang (admin/staff)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "paymentStatus",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "description": "Tim theo ma don hang",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach don hang co phan trang"
+          },
+          "403": {
+            "description": "Khong du quyen"
+          }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Chi tiet don hang (theo ID hoac orderCode)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "ObjectId hoac orderCode (VD MRS20250101ABCDE)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chi tiet don hang",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Order"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Khong phai don cua ban"
+          },
+          "404": {
+            "description": "Không tìm thấy đơn hàng"
+          }
+        }
+      }
+    },
+    "/orders/{id}/cancel": {
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Huy don hang (khach chi huy duoc khi don dang pending)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã huỷ don",
+            "ton kho duoc hoan lai": null
+          },
+          "400": {
+            "description": "Trang thai don khong cho phep huy"
+          }
+        }
+      }
+    },
+    "/orders/{id}/retry-payment": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Tao lai link thanh toan cho don chua thanh toan",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "enum": [
+                      "vnpay",
+                      "stripe",
+                      "momo"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "{ type, redirectUrl }"
+          }
+        }
+      }
+    },
+    "/orders/{id}/status": {
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Cap nhat trang thai don hang (admin/staff) - kiem tra luong chuyen hop le va gui email",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "confirmed",
+                      "processing",
+                      "shipping",
+                      "delivered",
+                      "cancelled",
+                      "returned"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Da cap nhat trang thai"
+          },
+          "400": {
+            "description": "Buoc chuyen trang thai khong hop le"
+          }
+        }
+      }
+    },
+    "/coupons/public": {
+      "get": {
+        "tags": [
+          "Coupons"
+        ],
+        "summary": "Ma giam gia dang chay (hien thi o trang gio hang)",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Danh sach ma giam gia cong khai"
+          }
+        }
+      }
+    },
+    "/coupons/validate": {
+      "post": {
+        "tags": [
+          "Coupons"
+        ],
+        "summary": "Kiem tra ma giam gia truoc khi ap dung",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "subtotal": {
+                    "type": "number",
+                    "description": "Neu bo trong se lay tam tinh tu gio hang tren server"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "{ coupon, discount, finalSubtotal }"
+          },
+          "400": {
+            "description": "Ma het han / chua dat giá trị toi thieu / het luot"
+          },
+          "404": {
+            "description": "Ma khong ton tai"
+          }
+        }
+      }
+    },
+    "/coupons": {
+      "get": {
+        "tags": [
+          "Coupons"
+        ],
+        "summary": "Danh sach ma giam gia (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach co phan trang"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Coupons"
+        ],
+        "summary": "Tao ma giam gia (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CouponInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đã tạo mã giảm giá"
+          }
+        }
+      }
+    },
+    "/coupons/{id}": {
+      "put": {
+        "tags": [
+          "Coupons"
+        ],
+        "summary": "Cap nhat ma giam gia (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Da cap nhat"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Coupons"
+        ],
+        "summary": "Xoa ma giam gia (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đã xoá"
+          }
+        }
+      }
+    },
+    "/banners": {
+      "get": {
+        "tags": [
+          "Banners"
+        ],
+        "summary": "Danh sach banner / noi dung trang chu",
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "hero_video",
+                "hero_image",
+                "collection_banner",
+                "promo",
+                "story"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach banner"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Banners"
+        ],
+        "summary": "Tao banner (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "mediaUrl"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "subtitle": {
+                    "type": "string"
+                  },
+                  "eyebrow": {
+                    "type": "string"
+                  },
+                  "ctaLabel": {
+                    "type": "string"
+                  },
+                  "mediaUrl": {
+                    "type": "string"
+                  },
+                  "posterUrl": {
+                    "type": "string"
+                  },
+                  "linkUrl": {
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "integer"
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đã tạo banner"
+          }
+        }
+      }
+    },
+    "/banners/home": {
+      "get": {
+        "tags": [
+          "Banners"
+        ],
+        "summary": "Noi dung trang chu gom theo type (1 request duy nhat)",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "{ hero_video: [], collection_banner: [], ... }"
+          }
+        }
+      }
+    },
+    "/banners/{id}": {
+      "put": {
+        "tags": [
+          "Banners"
+        ],
+        "summary": "Cap nhat banner (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Da cap nhat"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Banners"
+        ],
+        "summary": "Xoa banner (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đã xoá"
+          }
+        }
+      }
+    },
+    "/admin/dashboard/stats": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Thong ke tong quan cho admin",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "description": "So ngay tinh doanh thu gan nhat",
+            "schema": {
+              "type": "integer",
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{ summary, revenueByDay, statusBreakdown, topProducts }"
+          },
+          "403": {
+            "description": "Khong du quyen"
+          }
+        }
+      }
+    },
+    "/upload/image": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "summary": "Tai anh len Cloudinary (toi da 10 file, moi file 5MB)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "folder": {
+                    "type": "string",
+                    "description": "Thu muc luu tru (products, banners, avatars, reviews)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "{ images: [{url, publicId}], urls: [] }"
+          },
+          "400": {
+            "description": "Sai dinh dang hoac vuot dung luong"
+          }
+        }
+      }
+    },
+    "/upload/public": {
+      "post": {
+        "tags": [
+          "Upload"
+        ],
+        "summary": "Tai anh len cho khach hang (avatar, anh danh gia) - toi da 5 file",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tai anh thanh cong"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Kiem tra server song",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "{ status: 'ok' }"
+          }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Danh sach danh muc",
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "tree",
+            "description": "Tra ve dang cay (danh muc cha chua children)",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sach danh muc",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Category"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Tao danh muc (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đã tạo danh mục"
+          },
+          "403": {
+            "description": "Khong du quyen"
+          }
+        }
+      }
+    },
+    "/categories/{slug}": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Chi tiet danh muc theo slug",
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chi tiet danh muc"
+          },
+          "404": {
+            "description": "Không tìm thấy danh mục"
+          }
+        }
+      }
+    },
+    "/categories/{id}": {
+      "put": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Cap nhat danh muc (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Da cap nhat"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Xoa danh muc (admin) - chi khi khong con san pham/danh muc con",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đã xoá"
+          },
+          "400": {
+            "description": "Danh muc con chua san pham hoac danh muc con"
+          }
+        }
+      }
+    },
+    "/cart": {
+      "get": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Lay gio hang hien tai (da dong bo gia va ton kho moi nhat)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gio hang",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Cart"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cart/add": {
+      "post": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Them san pham vao gio hang",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "productId",
+                  "variantSku"
+                ],
+                "properties": {
+                  "productId": {
+                    "type": "string"
+                  },
+                  "variantSku": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "default": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gio hang sau khi them"
+          },
+          "400": {
+            "description": "Khong du ton kho hoac variant khong hop le"
+          }
+        }
+      }
+    },
+    "/cart/update": {
+      "put": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Cap nhat so luong mot dong trong gio (quantity = 0 se xoa dong do)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "itemId",
+                  "quantity"
+                ],
+                "properties": {
+                  "itemId": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gio hang sau khi cap nhat"
+          }
+        }
+      }
+    },
+    "/cart/merge": {
+      "post": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Gop gio hang khach vang (localStorage) vao gio hang tren server",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "productId": {
+                          "type": "string"
+                        },
+                        "variantSku": {
+                          "type": "string"
+                        },
+                        "quantity": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gio hang sau khi gop"
+          }
+        }
+      }
+    },
+    "/cart/remove/{itemId}": {
+      "delete": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Xoa mot dong khoi gio hang",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "itemId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gio hang sau khi xoa"
+          }
+        }
+      }
+    },
+    "/cart/clear": {
+      "delete": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Xoa toan bo gio hang",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gio hang rong"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Dang ky tai khoan moi",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đăng ký thành công, tra ve accessToken va set refreshToken vao httpOnly cookie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email đã tồn tại"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Dang nhap",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đăng nhập thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sai email hoac mat khau"
+          },
+          "403": {
+            "description": "Tai khoan bi khoa"
+          }
+        }
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Lam moi access token bang refresh token trong cookie",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Tra ve accessToken moi"
+          },
+          "401": {
+            "description": "Refresh token khong hop le hoac het han"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Dang xuat, xoa refresh token",
+        "responses": {
+          "200": {
+            "description": "Đã đăng xuất"
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Lay thong tin nguoi dung dang dang nhap",
+        "responses": {
+          "200": {
+            "description": "Thong tin user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/SuccessResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/User"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chua dang nhap"
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Gui email dat lai mat khau",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Da gui huong dan (khong tiet lo email co ton tai hay khong)"
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Đặt lại mật khẩu bang token nhan qua email",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token",
+                  "password"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 6
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đặt lại mật khẩu thanh cong"
+          },
+          "400": {
+            "description": "Token không hợp lệ hoac da het han"
+          }
+        }
+      }
+    },
+    "/auth/change-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Doi mat khau khi da dang nhap",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "currentPassword",
+                  "newPassword"
+                ],
+                "properties": {
+                  "currentPassword": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 6
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đổi mật khẩu thành công"
+          },
+          "400": {
+            "description": "Mật khẩu hiện tại không đúng"
+          }
+        }
+      }
+    }
+  }
+}

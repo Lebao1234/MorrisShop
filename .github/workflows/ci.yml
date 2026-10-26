@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+
+jobs:
+  quality:
+    name: Lint · Test · Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Cài dependencies
+        run: npm ci
+
+      - name: Kiểm tra ESLint
+        run: npx eslint client/src server/src server/tests server/scripts --ext .js,.jsx
+
+      - name: Chạy test backend
+        # mongodb-memory-server tự tải binary, không cần dịch vụ MongoDB riêng
+        run: npm test
+        env:
+          NODE_ENV: test
+          JWT_ACCESS_SECRET: ci_access_secret
+          JWT_REFRESH_SECRET: ci_refresh_secret
+
+      - name: Build frontend
+        run: npm run build
+        env:
+          VITE_API_BASE_URL: http://localhost:5000/api
+
+      - name: Xuất OpenAPI spec
+        run: npm run docs:export
+
+      - name: Lưu bản build
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-dist
+          path: client/dist
+          retention-days: 7

@@ -1,0 +1,170 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 42 27% 95%; /* bone #F7F5F0 */
+    --foreground: 0 0% 4%; /* ink  #0B0B0B */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+    --popover: 42 27% 97%;
+    --popover-foreground: 0 0% 4%;
+    --primary: 0 0% 4%;
+    --primary-foreground: 42 27% 95%;
+    --secondary: 40 20% 90%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 40 18% 91%;
+    --muted-foreground: 40 6% 42%;
+    --accent: 33 35% 51%; /* copper #B08D57 */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 4 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 38 16% 85%;
+    --input: 38 16% 85%;
+    --ring: 33 35% 51%;
+    --radius: 0.25rem;
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 42 27% 95%;
+    --card: 0 0% 8%;
+    --card-foreground: 42 27% 95%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 42 27% 95%;
+    --primary: 42 27% 95%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 13%;
+    --secondary-foreground: 42 27% 95%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 40 8% 62%;
+    --accent: 33 35% 55%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 4 62% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 17%;
+    --input: 0 0% 17%;
+    --ring: 33 35% 55%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bone text-ink font-sans antialiased;
+    font-feature-settings: "ss01", "cv01";
+  }
+
+  ::selection {
+    @apply bg-ink text-bone;
+  }
+
+  /* Thanh cuon manh, hop voi thiet ke bien tap */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-bone-warm;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ink/20 rounded-full border-[3px] border-solid border-bone-warm;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink/40;
+  }
+
+  /* Chi hien vien focus khi dieu huong bang ban phim */
+  :focus-visible {
+    @apply outline-none ring-2 ring-copper ring-offset-2 ring-offset-bone;
+  }
+}
+
+@layer components {
+  /*
+   * Lop nhieu (film grain) co dinh toan man hinh - khong gan vao container cuon
+   * de tranh GPU repaint lien tuc.
+   */
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply;
+  }
+
+  /* Nhan eyebrow dang vien tron dat truoc cac tieu de lon */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full border border-ink/12 px-3 py-1 text-eyebrow font-medium uppercase text-ink-faint;
+  }
+
+  /* Doppelrand: vo ngoai + loi trong, ban kinh dong tam */
+  .bezel {
+    @apply rounded-bezel bg-ink/[0.035] p-1.5 ring-1 ring-inset ring-ink/[0.07];
+  }
+  .bezel-core {
+    @apply rounded-bezel-inner bg-white shadow-inset;
+  }
+
+  /* Lien ket bien tap co gach chan truot vao */
+  .link-editorial {
+    @apply relative inline-block text-[0.6875rem] font-medium uppercase tracking-editorial;
+  }
+  .link-editorial::after {
+    content: "";
+    @apply absolute -bottom-1 left-0 h-px w-full origin-right scale-x-0 bg-current transition-transform duration-600 ease-spring;
+  }
+  .link-editorial:hover::after {
+    @apply origin-left scale-x-100;
+  }
+
+  /* Duong ke mo dung phan tach cac khoi bien tap */
+  .hairline {
+    @apply border-t border-ink/10;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  /* Chi bat will-change tren phan tu dang thuc su chuyen dong */
+  .gpu {
+    will-change: transform, opacity;
+  }
+}
+
+/* Ton trong tuy chon giam chuyen dong cua nguoi dung */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
