@@ -50,14 +50,6 @@ npm run dev       # chạy song song server (:5000) và client (:5173)
 | http://localhost:5000/api-docs | Swagger UI — test API ngay trên trình duyệt |
 | http://localhost:5000/api-docs.json | OpenAPI spec (import vào Postman/Insomnia) |
 
-### Tài khoản có sẵn sau khi seed
-
-| Vai trò | Email | Mật khẩu |
-|---|---|---|
-| Quản trị viên | `admin@morrisshop.vn` | `admin123` |
-| Nhân viên | `staff@morrisshop.vn` | `staff123` |
-| Khách hàng | `customer@morrisshop.vn` | `customer123` |
-
 > Trang đăng nhập có sẵn nút điền nhanh ba tài khoản này trong môi trường dev.
 
 ---
